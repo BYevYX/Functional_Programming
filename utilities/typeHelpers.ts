@@ -10,3 +10,14 @@ export type OmitFirstParam<F extends AnyFn> =
         : Curried<(...args: Rest) => R>
       : never
     : never;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CurryForOne<F extends (...args: any[]) => any> = F extends (
+  ...args: infer P
+) => infer R
+  ? P extends [infer A, ...infer Rest]
+    ? Rest extends []
+      ? (arg: A) => R
+      : (arg: A) => CurryForOne<(...args: Rest) => R>
+    : () => R
+  : never;

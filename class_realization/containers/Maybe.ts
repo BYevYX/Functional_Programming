@@ -1,7 +1,10 @@
-import { Traversable } from '../structures/functors/foldable-traversable.js';
+import { curry } from '../../functions/curry.js';
+import { liftA2 } from '../functions/lift.js';
+import { TraversableMixin } from '../structures/functors/foldable-traversable.js';
 import { Applicative, Monad } from '../structures/functors/pointed-monad.js';
 
-export class Maybe<T> extends Traversable<T> implements Monad<T> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class Maybe<T> extends TraversableMixin(Monad<any>) {
   constructor(val: T) {
     super(val);
   }
@@ -40,8 +43,19 @@ export class Maybe<T> extends Traversable<T> implements Monad<T> {
   ): Applicative<Maybe<U>> {
     return this.isNothing ? of(Maybe.nothing()) : fn(this.value).map(Maybe.of);
   }
-
-//   reduce<R>(fn: (acc: R, val: T) => R, initialValue: R): R {}
+  reduce<R>(fn: (acc: R, val: T) => R, initialValue: R): R {
+    return this.isNothing ? initialValue : fn(initialValue, this.value);
+  }
 }
 
-const m = Maybe.of(null);
+const t = liftA2(
+  (a: number) => (b: number) => a + b,
+  Maybe.of(12),
+  Maybe.of(12),
+);
+
+const u = Maybe.of(12)
+  .map((a: number) => (b: number) => a + b)
+  .ap(Maybe.of(152));
+
+const c = curry(<A,B,C>(a: A, b: B, c: C) => 'lol')(1,)

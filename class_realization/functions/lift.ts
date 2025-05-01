@@ -1,16 +1,8 @@
 import { Applicative } from '../structures/functors/pointed-monad.js';
-import { curry } from './curry.js';
+import { curry } from '../../functions/curry.js';
+import { CurryForOne } from '../../utilities/typeHelpers.js';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type CurryForOne<F extends (...args: any[]) => any> = F extends (
-  ...args: infer P
-) => infer R
-  ? P extends [infer A, ...infer Rest]
-    ? Rest extends []
-      ? (arg: A) => R
-      : (arg: A) => CurryForOne<(...args: Rest) => R>
-    : () => R
-  : never;
+// BIG TROUBLE: типизация функций с дженериками после каррировани ломается (так как ts по отдельным аргументам не может получить параметры в <>)
 
 export const liftA2 = curry(
   <A, B, C>(
